@@ -1,4 +1,4 @@
-﻿const defaultRepository = require('../repositories/task.repository');
+const defaultRepository = require('../repositories/task.repository');
 
 function createTaskService(repository = defaultRepository) {
   return {
@@ -38,17 +38,17 @@ function createTaskService(repository = defaultRepository) {
         throw error;
       }
       if (title.length > 160) {
-        const error = new Error('El tÃ­tulo no puede superar los 160 caracteres.');
+        const error = new Error('El título no puede superar los 160 caracteres.');
         error.status = 400;
         throw error;
       }
       if (typeof description !== 'string') {
-        const error = new Error('La descripciÃ³n debe ser un texto.');
+        const error = new Error('La descripción debe ser un texto.');
         error.status = 400;
         throw error;
       }
       if (description.length > 5000) {
-        const error = new Error('La descripciÃ³n no puede superar los 5000 caracteres.');
+        const error = new Error('La descripción no puede superar los 5000 caracteres.');
         error.status = 400;
         throw error;
       }
@@ -59,7 +59,7 @@ function createTaskService(repository = defaultRepository) {
     async updateTask(id, payload) {
       const numericId = Number(id);
       if (!Number.isSafeInteger(numericId) || numericId <= 0) {
-        const error = new Error('El identificador de la tarea no es vÃ¡lido.');
+        const error = new Error('El identificador de la tarea no es válido.');
         error.status = 400;
         throw error;
       }
@@ -75,7 +75,7 @@ function createTaskService(repository = defaultRepository) {
     async deleteTask(id) {
       const numericId = Number(id);
       if (!Number.isSafeInteger(numericId) || numericId <= 0) {
-        const error = new Error('El identificador de la tarea no es vÃ¡lido.');
+        const error = new Error('El identificador de la tarea no es válido.');
         error.status = 400;
         throw error;
       }
