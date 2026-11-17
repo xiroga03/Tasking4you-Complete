@@ -12,13 +12,12 @@ async function startServer() {
         id BIGSERIAL PRIMARY KEY,
         title VARCHAR(160) NOT NULL,
         description TEXT NOT NULL DEFAULT '',
+        due_date DATE,
         completed BOOLEAN NOT NULL DEFAULT FALSE,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        due_date DATE
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
-
     // Mantiene compatibles las bases creadas antes de incorporar fechas límite.
     await pool.query(`
       ALTER TABLE public.tasks

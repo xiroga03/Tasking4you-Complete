@@ -1,5 +1,6 @@
-﻿
+
 import { useEffect, useState } from 'react';
+import AuthGate from './components/AuthGate';
 import { CheckCircle2, Clock3, ListTodo, Sparkles } from 'lucide-react';
 
 import Sidebar from './components/Sidebar';
@@ -7,6 +8,8 @@ import Header from './components/Header';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import CalendarView from './components/CalendarView';
+import TaskEditor from './components/TaskEditor';
+import SettingsPanel from './components/SettingsPanel';
 import './App.css';
 
 const API_URL = (
@@ -17,7 +20,8 @@ function mapTask(task) {
   return {
     ...task,
     id: Number(task.id),
-    done: task.completed
+    done: task.completed,
+    dueDate: task.due_date || task.dueDate || ''
   };
 }
 
@@ -33,26 +37,40 @@ async function apiRequest(endpoint, options = {}) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || data.error || 'No se pudo completar la operaciÃ³n.');
+    throw new Error(data.message || data.error || 'No se pudo completar la operación.');
   }
 
   return data;
 }
 
-function App() {
+function Dashboard({ userName, onLogout }) {
   const [tasks, setTasks] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [theme, setTheme] = useState('light');
-
-  const toggleTheme = () => {
-    setTheme((current) => current === 'light' ? 'dark' : 'light');
-  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [settings, setSettings] = useState(() => {
+    try {
+      return { darkMode: false, notificationsEnabled: true, compactMode: false, ...JSON.parse(localStorage.getItem('tasking4you_settings') || '{}') };
+    } catch {
+      return { darkMode: false, notificationsEnabled: true, compactMode: false };
+    }
+  });
 
-  // Cargar las tareas desde PostgreSQL al iniciar la aplicaciÃ³n.
   useEffect(() => {
+    localStorage.setItem('tasking4you_settings', JSON.stringify(settings));
+    document.documentElement.dataset.theme = settings.darkMode ? 'dark' : 'light';
+  }, [settings]);
+
+  // Cargar las tareas desde PostgreSQL al iniciar la aplicación.
+  useEffect(() => {
+    if (!userName) {
+      setLoading(false);
+      return;
+    }
     const loadTasks = async () => {
       try {
         setLoading(true);
@@ -71,7 +89,7 @@ function App() {
     };
 
     loadTasks();
-  }, []);
+  }, [userName]);
 
   // Crear una tarea en la base de datos.
   const addTask = async (taskData) => {
@@ -83,7 +101,7 @@ function App() {
         body: JSON.stringify({
           title: taskData.title,
           description: taskData.description || '',
-          due_date: taskData.due_date || null
+          due_date: taskData.due_date || taskData.dueDate || null
         })
       });
 
@@ -96,6 +114,27 @@ function App() {
       return false;
     }
     return true;
+  };
+
+  const updateTask = async (id, taskData) => {
+    try {
+      setError('');
+      const data = await apiRequest(`/api/tasks/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title: taskData.title,
+          description: taskData.description || '',
+          due_date: taskData.due_date || taskData.dueDate || null
+        })
+      });
+      setTasks((previousTasks) => previousTasks.map((task) =>
+        task.id === id ? mapTask(data.task) : task
+      ));
+      return true;
+    } catch (err) {
+      setError(err.message || 'No se pudo guardar la tarea.');
+      return false;
+    }
   };
 
   // Cambiar el estado de una tarea en PostgreSQL.
@@ -173,27 +212,36 @@ function App() {
   }).format(new Date());
 
   return (
-    <div className={`app-layout theme-${theme}`}>
+    <div className={`app-layout ${settings.compactMode ? 'compact-mode' : ''}`}>
       <Sidebar
         activeFilter={activeFilter}
         setActiveFilter={setActiveFilter}
         taskCounts={taskCounts}
+        userName={userName}
+        onLogout={onLogout}
+        onChangeAccount={onLogout}
+        onOpenSettings={() => { setNotificationsOpen(false); setSettingsOpen(true); }}
       />
+      <SettingsPanel open={settingsOpen} settings={settings} setSettings={setSettings} onClose={() => setSettingsOpen(false)} />
 
       <main className="main-content">
         <Header
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          theme={theme}
-          onToggleTheme={toggleTheme}
+          tasks={tasks}
+          notificationsOpen={notificationsOpen}
+          setNotificationsOpen={(open) => { setSettingsOpen(false); setNotificationsOpen(open); }}
+          notificationsEnabled={settings.notificationsEnabled}
+          darkMode={settings.darkMode}
+          onToggleTheme={() => setSettings((current) => ({ ...current, darkMode: !current.darkMode }))}
         />
 
         <div className="dashboard-content">
           <section className="welcome-section">
             <div>
               <span className="date-label">{today}</span>
-              <h1>Â¡Hola! Bienvenido a tu espacio.</h1>
-              <p>Organiza tus actividades y haz que cada dÃ­a cuente.</p>
+              <h1>¡Hola! Bienvenido a tu espacio.</h1>
+              <p>Organiza tus actividades y haz que cada día cuente.</p>
             </div>
             <div className="welcome-decoration">
               <Sparkles size={38} />
@@ -236,55 +284,64 @@ function App() {
           )}
 
           {activeFilter === 'calendar' ? (
-  loading ? (
-    <p>Cargando calendario...</p>
-  ) : (
-    <CalendarView tasks={tasks} />
-  )
-) : (
-  <section className="workspace">
-    <div className="workspace-main">
-      <div className="section-heading">
-        <div>
-          <h2>Mis actividades</h2>
-          <p>Administra y revisa tus tareas.</p>
-        </div>
-        <span className="task-total">
-          {filteredTasks.length} tareas
-        </span>
-      </div>
+            loading ? <p>Cargando calendario...</p> : <CalendarView tasks={tasks} />
+          ) : (
+          <section className="workspace">
+            <div className="workspace-main">
+              <div className="section-heading">
+                <div>
+                  <h2>Mis actividades</h2>
+                  <p>Administra y revisa tus tareas.</p>
+                </div>
+                <span className="task-total">
+                  {filteredTasks.length} tareas
+                </span>
+              </div>
 
-      {loading ? (
-        <p>Cargando tareas...</p>
-      ) : (
-        <TaskList
-          tasks={filteredTasks}
-          onToggleTask={toggleTask}
-          onDeleteTask={deleteTask}
-        />
-      )}
-    </div>
+              {loading ? (
+                <p>Cargando tareas...</p>
+              ) : (
+                <TaskList
+                  tasks={filteredTasks}
+                  onToggleTask={toggleTask}
+                  onDeleteTask={deleteTask}
+                  onEditTask={setEditingTask}
+                />
+              )}
+            </div>
 
-    <div className="workspace-form">
-      <TaskForm onAddTask={addTask} />
-    </div>
-  </section>
-)}
+            <div className="workspace-form">
+              <TaskForm onAddTask={addTask} />
+            </div>
+          </section>
+          )}
 
           <footer className="dashboard-footer">
-            <span>Tasking4You Â© 2026</span>
+            <span>Tasking4You © 2026</span>
             <span>Organiza tu tiempo, alcanza tus metas.</span>
           </footer>
         </div>
       </main>
+      {editingTask && <TaskEditor key={editingTask.id} task={editingTask} onSave={updateTask} error={error} onClose={() => setEditingTask(null)} />}
     </div>
   );
 }
 
+function App() {
+  const [userName, setUserName] = useState(() => localStorage.getItem('tasking4you_demo_session') || '');
+
+  const signIn = (name) => {
+    localStorage.setItem('tasking4you_demo_session', name);
+    setUserName(name);
+  };
+
+  const signOut = () => {
+    localStorage.removeItem('tasking4you_demo_session');
+    setUserName('');
+  };
+
+  if (!userName) return <AuthGate onSignIn={signIn} />;
+  return <Dashboard userName={userName} onLogout={signOut} />;
+}
+
 export default App;
-
-
-
-
-
-

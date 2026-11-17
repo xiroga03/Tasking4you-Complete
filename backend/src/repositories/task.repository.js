@@ -22,10 +22,21 @@ async function create(task) {
 async function update(id, changes) {
   const { rows } = await pool.query(
     `UPDATE tasks
-     SET completed = $2, updated_at = NOW()
+     SET title = COALESCE($2, title),
+         description = COALESCE($3, description),
+         due_date = CASE WHEN $4 THEN $5::date ELSE due_date END,
+         completed = COALESCE($6, completed),
+         updated_at = NOW()
      WHERE id = $1
      RETURNING id, title, description, completed, created_at, updated_at, due_date`,
-    [id, changes.completed]
+    [
+      id,
+      changes.title ?? null,
+      changes.description ?? null,
+      changes.due_date !== undefined,
+      changes.due_date ?? null,
+      changes.completed ?? null
+    ]
   );
   return rows[0] || null;
 }

@@ -1,4 +1,4 @@
-﻿import { Check, Trash2, ClipboardList, CalendarDays } from 'lucide-react';
+﻿import { Check, Trash2, ClipboardList, CalendarDays, Pencil } from 'lucide-react';
 
 function formatDate(value) {
   if (!value) return 'Sin fecha límite';
@@ -8,7 +8,7 @@ function formatDate(value) {
   }).format(date);
 }
 
-function TaskList({ tasks, onToggleTask, onDeleteTask }) {
+function TaskList({ tasks, onToggleTask, onDeleteTask, onEditTask }) {
   if (tasks.length === 0) {
     return (
       <div className="empty-state">
@@ -43,10 +43,10 @@ function TaskList({ tasks, onToggleTask, onDeleteTask }) {
             </span>
           </div>
 
-          <button className="delete-task" onClick={() => onDeleteTask(task.id)}
-            aria-label="Eliminar tarea">
-            <Trash2 size={18} />
-          </button>
+          <div className="task-actions">
+            <button className="edit-task" onClick={() => onEditTask(task)} aria-label="Editar tarea"><Pencil size={17} /></button>
+            <button className="delete-task" onClick={() => onDeleteTask(task.id)} aria-label="Eliminar tarea"><Trash2 size={18} /></button>
+          </div>
         </article>
       ))}
     </div>
