@@ -9,7 +9,7 @@ import TaskList from './components/TaskList';
 import './App.css';
 
 const API_URL = (
-  import.meta.env.VITE_API_URL || 'http://localhost:3000'
+  import.meta.env.VITE_API_URL || 'https://tasking4you-complete.onrender.com'
 ).replace(/\/$/, '');
 
 function mapTask(task) {
@@ -32,7 +32,7 @@ async function apiRequest(endpoint, options = {}) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || 'No se pudo completar la operación.');
+    throw new Error(data.message || data.error || 'No se pudo completar la operación.');
   }
 
   return data;
@@ -86,7 +86,9 @@ function App() {
       ]);
     } catch (err) {
       setError(err.message || 'No se pudo guardar la tarea.');
+      return false;
     }
+    return true;
   };
 
   // Cambiar el estado de una tarea en PostgreSQL.
