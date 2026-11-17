@@ -1,4 +1,4 @@
-﻿
+
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Clock3, ListTodo, Sparkles } from 'lucide-react';
 
@@ -33,7 +33,7 @@ async function apiRequest(endpoint, options = {}) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || data.error || 'No se pudo completar la operaciÃ³n.');
+    throw new Error(data.message || data.error || 'No se pudo completar la operación.');
   }
 
   return data;
@@ -51,7 +51,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Cargar las tareas desde PostgreSQL al iniciar la aplicaciÃ³n.
+  // Cargar las tareas desde PostgreSQL al iniciar la aplicación.
   useEffect(() => {
     const loadTasks = async () => {
       try {
@@ -192,8 +192,8 @@ function App() {
           <section className="welcome-section">
             <div>
               <span className="date-label">{today}</span>
-              <h1>Â¡Hola! Bienvenido a tu espacio.</h1>
-              <p>Organiza tus actividades y haz que cada dÃ­a cuente.</p>
+              <h1>¡Hola! Bienvenido a tu espacio.</h1>
+              <p>Organiza tus actividades y haz que cada día cuente.</p>
             </div>
             <div className="welcome-decoration">
               <Sparkles size={38} />
@@ -272,7 +272,7 @@ function App() {
 )}
 
           <footer className="dashboard-footer">
-            <span>Tasking4You Â© 2026</span>
+            <span>Tasking4You © 2026</span>
             <span>Organiza tu tiempo, alcanza tus metas.</span>
           </footer>
         </div>
