@@ -1,4 +1,4 @@
-﻿
+
 import {
   LayoutDashboard,
   ListTodo,
@@ -36,7 +36,7 @@ function Sidebar({ activeFilter, setActiveFilter, taskCounts }) {
         Nueva tarea
       </button>
 
-      <div className="menu-label">MENÃš PRINCIPAL</div>
+      <div className="menu-label">MENÚ PRINCIPAL</div>
 
       <nav className="sidebar-menu">
         {menuItems.map((item) => {
@@ -59,13 +59,13 @@ function Sidebar({ activeFilter, setActiveFilter, taskCounts }) {
       <div className="sidebar-bottom">
         <div className="sidebar-tip">
           <CalendarDays size={22} />
-          <strong>Organiza tu dÃ­a</strong>
-          <p>PequeÃ±os avances hacen grandes resultados.</p>
+          <strong>Organiza tu día</strong>
+          <p>Pequeños avances hacen grandes resultados.</p>
         </div>
 
         <button className="menu-item settings-item">
           <Settings size={19} />
-          <span>ConfiguraciÃ³n</span>
+          <span>Configuración</span>
         </button>
 
         <div className="sidebar-user">
