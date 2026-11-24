@@ -1,11 +1,27 @@
 ﻿import { useState } from 'react';
 import { Plus } from 'lucide-react';
 
+const taskTemplates = [
+  { id: 'study', title: 'Bloque de estudio', description: 'Tema, material y resultado esperado.' },
+  { id: 'work', title: 'Tarea de trabajo', description: 'Actividad, responsable o siguiente paso.' },
+  { id: 'personal', title: 'Pendiente personal', description: 'Anota lo necesario para completar esta actividad.' }
+];
+
 function TaskForm({ onAddTask }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [saving, setSaving] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+
+  const applyTemplate = (event) => {
+    const template = taskTemplates.find((item) => item.id === event.target.value);
+    setSelectedTemplate(event.target.value);
+    if (!template) return;
+    setTitle(template.title);
+    setDescription(template.description);
+    document.getElementById('task-title')?.focus();
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -24,6 +40,7 @@ function TaskForm({ onAddTask }) {
         setTitle('');
         setDescription('');
         setDueDate('');
+        setSelectedTemplate('');
       }
     } finally {
       setSaving(false);
@@ -45,6 +62,15 @@ function TaskForm({ onAddTask }) {
       </div>
 
       <div className="form-fields">
+        <label htmlFor="task-template">Plantilla rápida</label>
+        <select id="task-template" value={selectedTemplate} onChange={applyTemplate}>
+          <option value="">En blanco</option>
+          {taskTemplates.map((template) => (
+            <option key={template.id} value={template.id}>{template.title}</option>
+          ))}
+        </select>
+
+        <label htmlFor="task-title">Título</label>
         <input
           id="task-title"
           type="text"
@@ -55,12 +81,14 @@ function TaskForm({ onAddTask }) {
           required
         />
 
-        <input
-          type="text"
-          placeholder="Descripción (opcional)"
+        <label htmlFor="task-description">Descripción (opcional)</label>
+        <textarea
+          id="task-description"
+          placeholder="Agrega contexto o pasos por realizar"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           maxLength={5000}
+          rows={3}
         />
 
         <label className="due-date-label" htmlFor="task-due-date">
@@ -70,7 +98,11 @@ function TaskForm({ onAddTask }) {
           id="task-due-date"
           type="date"
           value={dueDate}
-          min={new Date().toLocaleDateString('en-CA')}
+          min={(() => {
+            const today = new Date();
+            const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+            return localDate.toISOString().slice(0, 10);
+          })()}
           onChange={(event) => setDueDate(event.target.value)}
         />
 

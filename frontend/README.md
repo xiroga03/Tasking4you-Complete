@@ -38,4 +38,4 @@ npm run build
 - `components/TaskForm.jsx`: formulario de creación.
 - `components/TaskList.jsx`: listado, finalización y eliminación.
 
-> Estado actual: el dashboard maneja las tareas en el estado local de React. La conexión con la API REST y la persistencia PostgreSQL están pendientes de integración.
+El tablero carga y persiste las tareas mediante la API REST. Configura `VITE_API_URL` en `frontend/.env` para apuntar al backend local. El acceso de usuario es una demostración local y no protege los datos mediante autenticación de servidor.

@@ -9,6 +9,8 @@ Proyecto académico de Ingeniería Web desarrollado de forma colaborativa en la 
 ## Características
 
 - Crear tareas con título y descripción.
+- Editar tareas y asignar fechas límite.
+- Consultar tareas por fecha límite en un calendario.
 - Consultar las tareas almacenadas en PostgreSQL.
 - Marcar tareas como pendientes o completadas.
 - Eliminar tareas.
@@ -16,6 +18,10 @@ Proyecto académico de Ingeniería Web desarrollado de forma colaborativa en la 
 - Filtrar tareas por estado: todas, pendientes y completadas.
 - Consultar indicadores de tareas totales, pendientes y completadas.
 - Validar los datos recibidos por la API y mostrar errores de conexión.
+- Reintentar la carga cuando la API no responde.
+- Crear actividades a partir de plantillas rápidas editables.
+
+Consulta el [levantamiento de requerimientos](docs/REQUERIMIENTOS.md) y la [arquitectura](docs/ARQUITECTURA.md) para conocer el alcance y la separación por capas.
 
 ## Arquitectura
 
@@ -69,7 +75,7 @@ cd backend
 npm install
 ```
 
-Copia `.env.example` como `.env` y configura la conexión a PostgreSQL:
+Crea `backend/.env` localmente y configura la conexión a PostgreSQL:
 
 ```env
 PORT=3000
@@ -99,7 +105,7 @@ cd frontend
 npm install
 ```
 
-Configura el archivo `.env` a partir de `.env.example`:
+Configura `frontend/.env` localmente:
 
 ```env
 VITE_API_URL=http://localhost:3000
@@ -126,7 +132,7 @@ Base URL local: `http://localhost:3000`
 | GET | `/api/health` | Comprueba la disponibilidad de API y PostgreSQL. |
 | GET | `/api/tasks` | Obtiene el listado de tareas. |
 | POST | `/api/tasks` | Crea una tarea con título y descripción. |
-| PATCH | `/api/tasks/:id` | Actualiza el estado de una tarea. |
+| PATCH | `/api/tasks/:id` | Actualiza el estado o uno o varios campos de una tarea. |
 | DELETE | `/api/tasks/:id` | Elimina una tarea. |
 
 Ejemplo de creación:
@@ -155,7 +161,7 @@ cd backend
 npm test
 ```
 
-En la última ejecución local registrada, las 6 pruebas finalizaron correctamente.
+El archivo de pruebas contiene 9 casos unitarios para las reglas del servicio. Ejecuta el comando para comprobar el estado actual.
 
 Frontend:
 
@@ -237,7 +243,7 @@ Dominio personalizado: pendiente de conectar y verificar.
 
 - No subir archivos `.env`, contraseñas ni cadenas de conexión reales.
 - Mantener las credenciales en variables de entorno.
-- Usar `.env.example` como plantilla sin secretos.
+- Crear los archivos `.env` de forma local y no incluirlos en Git.
 - Configurar CORS con el origen autorizado.
 - No publicar claves privadas ni tokens.
 

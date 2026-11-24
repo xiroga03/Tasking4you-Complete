@@ -4,7 +4,10 @@ Para evitar conflictos y conservar el trabajo de cada integrante, se propone el 
 
 ## Ramas
 
-- `main`: versión estable e integrada del proyecto.
+- `main`: versión estable integrada y protegida.
+- `development`: integración del trabajo revisado.
+- `final`: versión congelada que se presenta como entrega.
+- `feature/nombre-funcionalidad` / `fix/nombre-problema`: cambios aislados, creados desde `development`.
 - `feature/nombre-funcionalidad`: nuevas funcionalidades.
 - `fix/nombre-problema`: correcciones.
 - `docs/tema`: cambios de documentación.
@@ -13,13 +16,19 @@ Evitar trabajar directamente sobre `main`.
 
 ## Flujo de trabajo
 
-1. Actualizar la rama local desde GitHub.
-2. Crear una rama para la tarea asignada.
-3. Realizar cambios pequeños y probarlos localmente.
-4. Hacer commits descriptivos.
-5. Subir la rama y abrir un Pull Request hacia `main`.
-6. Solicitar revisión de otro integrante.
-7. Integrar el PR después de resolver observaciones y comprobar que no se rompa el proyecto.
+1. Actualizar `development` desde GitHub.
+2. Crear `feature/...` o `fix/...` desde `development`.
+3. Realizar cambios pequeños y comprobar el comportamiento afectado.
+4. Hacer commits descriptivos y abrir un Pull Request hacia `development`.
+5. Solicitar revisión de otro integrante y resolver sus observaciones.
+6. Integrar en `development`; cuando se apruebe una entrega, actualizar `final` y luego `main` mediante Pull Request.
+
+## Protección del repositorio
+
+- En GitHub, proteger `main` para requerir Pull Request y revisión antes de integrar cambios.
+- Mantener al menos una copia del proyecto y no usar la zona **Danger Zone** para borrar, transferir o archivar el repositorio durante el trabajo.
+- Revisar `git status` y los archivos del Pull Request antes de publicar; `.env`, credenciales, `node_modules/` y archivos generados no deben entrar en un commit.
+- No subir secretos para “probar” si `.gitignore` funciona. Si un secreto llegó al historial, revocarlo y reemplazarlo; borrarlo del último commit no lo invalida.
 
 ## Convención de commits
 

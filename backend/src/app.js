@@ -47,6 +47,9 @@ function createApp({ taskRepository } = {}) {
     if (error.type === 'entity.parse.failed') {
       return res.status(400).json({ error: 'El cuerpo enviado no contiene JSON válido.' });
     }
+    if (error.type === 'entity.too.large') {
+      return res.status(413).json({ error: 'El cuerpo de la solicitud supera el límite permitido.' });
+    }
     if (error.message === 'Origen no permitido por la política CORS.') {
       return res.status(403).json({ error: error.message });
     }

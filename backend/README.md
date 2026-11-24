@@ -16,7 +16,7 @@ Desde esta carpeta:
 npm install
 ```
 
-Copia `.env.example` como `.env` y configura los valores de tu instancia PostgreSQL.
+Crea un archivo `.env` local en esta carpeta y configura los valores de tu instancia PostgreSQL.
 
 Ejemplo para una instalación local:
 
@@ -54,7 +54,7 @@ Base URL: `/api`
 | GET | `/health` | Estado de API y PostgreSQL |
 | GET | `/tasks` | Listar tareas |
 | POST | `/tasks` | Crear tarea |
-| PATCH | `/tasks/:id` | Actualizar estado |
+| PATCH | `/tasks/:id` | Actualizar estado o campos de una tarea |
 | DELETE | `/tasks/:id` | Eliminar tarea |
 
 ### Crear tarea
@@ -75,7 +75,7 @@ El título es obligatorio y admite hasta 160 caracteres. La descripción es opci
 { "completed": true }
 ```
 
-El campo `completed` debe ser booleano.
+El campo `completed` debe ser booleano. También se pueden actualizar parcialmente `title`, `description` y `due_date`; envía `null` para quitar la fecha límite.
 
 ## Pruebas
 

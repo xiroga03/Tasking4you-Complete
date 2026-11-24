@@ -5,6 +5,16 @@
   font-family: 'DM Sans', sans-serif;
   color: #29243b;
   background: #f7f7fb;
+  --color-brand: #7555d9;
+  --color-brand-strong: #6242c4;
+  --color-text: #29243b;
+  --color-muted: #817b90;
+  --color-border: #e9e6f0;
+  --color-surface: #ffffff;
+  --color-surface-soft: #fbfaff;
+  --radius-card: 14px;
+  --radius-control: 9px;
+  --shadow-card: 0 8px 28px rgba(46, 36, 80, 0.06);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -22,7 +32,9 @@ body {
 }
 
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
 }
 
@@ -31,7 +43,9 @@ button {
 }
 
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 3px solid rgba(125, 91, 219, 0.25);
   outline-offset: 2px;
 }

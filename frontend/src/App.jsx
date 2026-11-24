@@ -25,14 +25,29 @@ function mapTask(task) {
   };
 }
 
+function LoadError({ message, onRetry }) {
+  return (
+    <div className="load-error-card" role="alert">
+      <h3>No pudimos cargar tus tareas</h3>
+      <p>{message}</p>
+      <button type="button" onClick={onRetry}>Reintentar</button>
+    </div>
+  );
+}
+
 async function apiRequest(endpoint, options = {}) {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers
-    }
-  });
+  let response;
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+  } catch {
+    throw new Error('No fue posible conectar con la API. Revisa tu conexión e inténtalo de nuevo.');
+  }
 
   const data = await response.json().catch(() => ({}));
 
@@ -48,6 +63,8 @@ function Dashboard({ userName, onLogout }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState('');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -74,22 +91,20 @@ function Dashboard({ userName, onLogout }) {
     const loadTasks = async () => {
       try {
         setLoading(true);
-        setError('');
+        setLoadError('');
 
         const data = await apiRequest('/api/tasks');
 
         setTasks((data.tasks || []).map(mapTask));
       } catch (err) {
-        setError(
-          err.message || 'No fue posible conectar con el servidor.'
-        );
+        setLoadError(err.message || 'No fue posible conectar con el servidor.');
       } finally {
         setLoading(false);
       }
     };
 
     loadTasks();
-  }, [userName]);
+  }, [userName, reloadKey]);
 
   // Crear una tarea en la base de datos.
   const addTask = async (taskData) => {
@@ -175,8 +190,10 @@ function Dashboard({ userName, onLogout }) {
       setTasks((previousTasks) =>
         previousTasks.filter((task) => task.id !== id)
       );
+      return true;
     } catch (err) {
       setError(err.message || 'No se pudo eliminar la tarea.');
+      return false;
     }
   };
 
@@ -254,7 +271,7 @@ function Dashboard({ userName, onLogout }) {
                 <ListTodo size={22} />
               </div>
               <span className="stat-label">Total de tareas</span>
-              <strong>{totalTasks}</strong>
+              <strong>{loading || loadError ? '—' : totalTasks}</strong>
               <span className="stat-description">Actividades registradas</span>
             </article>
 
@@ -263,7 +280,7 @@ function Dashboard({ userName, onLogout }) {
                 <Clock3 size={22} />
               </div>
               <span className="stat-label">Pendientes</span>
-              <strong>{pendingTasks}</strong>
+              <strong>{loading || loadError ? '—' : pendingTasks}</strong>
               <span className="stat-description">Por realizar</span>
             </article>
 
@@ -272,7 +289,7 @@ function Dashboard({ userName, onLogout }) {
                 <CheckCircle2 size={22} />
               </div>
               <span className="stat-label">Completadas</span>
-              <strong>{completedTasks}</strong>
+              <strong>{loading || loadError ? '—' : completedTasks}</strong>
               <span className="stat-description">Objetivos alcanzados</span>
             </article>
           </section>
@@ -284,7 +301,9 @@ function Dashboard({ userName, onLogout }) {
           )}
 
           {activeFilter === 'calendar' ? (
-            loading ? <p>Cargando calendario...</p> : <CalendarView tasks={tasks} />
+            loading ? <p role="status">Cargando calendario…</p>
+              : loadError ? <LoadError message={loadError} onRetry={() => setReloadKey((key) => key + 1)} />
+                : <CalendarView tasks={tasks} />
           ) : (
           <section className="workspace">
             <div className="workspace-main">
@@ -299,13 +318,18 @@ function Dashboard({ userName, onLogout }) {
               </div>
 
               {loading ? (
-                <p>Cargando tareas...</p>
+                <p role="status">Cargando tareas…</p>
+              ) : loadError ? (
+                <LoadError message={loadError} onRetry={() => setReloadKey((key) => key + 1)} />
               ) : (
                 <TaskList
                   tasks={filteredTasks}
                   onToggleTask={toggleTask}
                   onDeleteTask={deleteTask}
                   onEditTask={setEditingTask}
+                  searchTerm={searchTerm}
+                  activeFilter={activeFilter}
+                  onClearSearch={() => setSearchTerm('')}
                 />
               )}
             </div>

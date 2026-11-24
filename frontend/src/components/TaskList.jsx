@@ -1,5 +1,7 @@
 ﻿import { Check, Trash2, ClipboardList, CalendarDays, Pencil } from 'lucide-react';
 
+import { useState } from 'react';
+
 function formatDate(value) {
   if (!value) return 'Sin fecha límite';
   const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
@@ -8,13 +10,25 @@ function formatDate(value) {
   }).format(date);
 }
 
-function TaskList({ tasks, onToggleTask, onDeleteTask, onEditTask }) {
+function TaskList({ tasks, onToggleTask, onDeleteTask, onEditTask, searchTerm = '', activeFilter = 'all', onClearSearch }) {
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
   if (tasks.length === 0) {
+    const heading = searchTerm
+      ? 'No encontramos tareas'
+      : activeFilter === 'pending'
+        ? 'No tienes tareas pendientes'
+        : activeFilter === 'completed'
+          ? 'Aún no hay tareas completadas'
+          : 'No hay tareas por aquí';
+
     return (
       <div className="empty-state">
         <div className="empty-icon"><ClipboardList size={32} /></div>
-        <h3>No hay tareas por aquí</h3>
-        <p>Agrega una nueva actividad para comenzar a organizarte.</p>
+        <h3>{heading}</h3>
+        <p>{searchTerm ? 'Prueba con otras palabras o limpia la búsqueda.' : 'Agrega una actividad para comenzar a organizarte.'}</p>
+        {searchTerm && <button type="button" className="secondary-button" onClick={onClearSearch}>Limpiar búsqueda</button>}
       </div>
     );
   }
@@ -44,8 +58,26 @@ function TaskList({ tasks, onToggleTask, onDeleteTask, onEditTask }) {
           </div>
 
           <div className="task-actions">
-            <button className="edit-task" onClick={() => onEditTask(task)} aria-label="Editar tarea"><Pencil size={17} /></button>
-            <button className="delete-task" onClick={() => onDeleteTask(task.id)} aria-label="Eliminar tarea"><Trash2 size={18} /></button>
+            {confirmDeleteId === task.id ? (
+              <div className="delete-confirmation" role="group" aria-label={`Confirmar eliminación de ${task.title}`}>
+                <span>¿Eliminar?</span>
+                <button type="button" disabled={deletingId === task.id} onClick={async () => {
+                  setDeletingId(task.id);
+                  try {
+                    const deleted = await onDeleteTask(task.id);
+                    if (deleted !== false) setConfirmDeleteId(null);
+                  } finally {
+                    setDeletingId(null);
+                  }
+                }}>{deletingId === task.id ? 'Eliminando…' : 'Sí, eliminar'}</button>
+                <button type="button" disabled={deletingId === task.id} onClick={() => setConfirmDeleteId(null)}>Cancelar</button>
+              </div>
+            ) : (
+              <>
+                <button className="edit-task" onClick={() => onEditTask(task)} aria-label={`Editar ${task.title}`}><Pencil size={17} /></button>
+                <button className="delete-task" onClick={() => setConfirmDeleteId(task.id)} aria-label={`Eliminar ${task.title}`}><Trash2 size={18} /></button>
+              </>
+            )}
           </div>
         </article>
       ))}

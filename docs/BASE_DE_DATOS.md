@@ -19,7 +19,7 @@ CREATE DATABASE tasking4you;
 
 ## 2. Configurar las credenciales del backend
 
-Dentro de `backend/`, copia `.env.example` a un archivo llamado `.env`.
+Dentro de `backend/`, crea un archivo local llamado `.env` con la configuración de tu base de datos.
 
 Ejemplo local (reemplaza usuario y contraseña por los tuyos):
 
@@ -45,6 +45,7 @@ También puedes ejecutar manualmente el contenido de `backend/sql/schema.sql` de
 | `id` | BIGSERIAL | Clave primaria autoincremental |
 | `title` | VARCHAR(160) | Título obligatorio |
 | `description` | TEXT | Descripción; por defecto vacía |
+| `due_date` | DATE | Fecha límite opcional |
 | `completed` | BOOLEAN | Estado; por defecto FALSE |
 | `created_at` | TIMESTAMPTZ | Fecha de creación |
 | `updated_at` | TIMESTAMPTZ | Fecha de última actualización |

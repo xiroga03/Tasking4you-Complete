@@ -29,7 +29,10 @@ function Sidebar({ activeFilter, setActiveFilter, taskCounts, userName, onLogout
     <aside className="sidebar">
       <div className="brand"><div className="brand-icon"><LayoutDashboard size={23} /></div><span>Tasking<span className="brand-highlight">4You</span></span></div>
       <div className="workspace-label">ESPACIO DE TRABAJO</div>
-      <button className="sidebar-create" onClick={() => document.getElementById('task-title')?.focus()}><Plus size={18} />Nueva tarea</button>
+      <button className="sidebar-create" onClick={() => {
+        if (activeFilter === 'calendar') setActiveFilter('all');
+        window.setTimeout(() => document.getElementById('task-title')?.focus(), 0);
+      }}><Plus size={18} />Nueva tarea</button>
       <div className="menu-label">MEN&Uacute; PRINCIPAL</div>
       <nav className="sidebar-menu" aria-label="Tareas">
         {menuItems.map((item) => { const Icon = item.icon; return (

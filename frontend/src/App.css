@@ -1680,3 +1680,63 @@ html[data-theme="dark"] .settings-title span { color: #aaa3ba; }
 html[data-theme="dark"] .profile-trigger { background: linear-gradient(110deg, #352b4c 0%, #292433 100%); border-color: #493c65; }
 html[data-theme="dark"] .profile-trigger:hover { background: linear-gradient(110deg, #40345c 0%, #302a3e 100%); }
 html[data-theme="dark"] .profile-trigger .sidebar-user-info strong { color: #eeeaf7; }
+
+/* Controles coherentes para formularios y estados de operación. */
+.form-fields > label {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.form-fields select,
+.form-fields textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  padding: 11px 12px;
+  font-size: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-fields select:focus,
+.form-fields textarea:focus {
+  border-color: #9b80e5;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(125, 91, 219, 0.12);
+}
+
+.form-fields textarea { resize: vertical; min-height: 88px; line-height: 1.5; }
+.task-form { box-shadow: var(--shadow-card); }
+.task-card { border-radius: var(--radius-card); }
+.task-actions button:disabled { opacity: 0.45; cursor: wait; }
+.delete-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  color: #8b4b52;
+  font-size: 11px;
+}
+.delete-confirmation button {
+  border: 1px solid #efd5d8;
+  border-radius: 7px;
+  padding: 6px 9px;
+  background: #fff7f7;
+  color: #8b343d;
+  font-weight: 700;
+}
+.delete-confirmation button:last-child { background: transparent; color: #756f81; }
+.load-error-card { padding: 22px; border: 1px solid #f0d6d2; border-radius: var(--radius-card); background: #fff9f8; }
+.load-error-card h3 { margin: 0 0 7px; color: #713d42; font-size: 15px; }
+.load-error-card p { margin: 0 0 14px; color: #846b70; font-size: 12px; line-height: 1.5; }
+.load-error-card button { border: 0; border-radius: 8px; padding: 9px 13px; background: var(--color-brand); color: #fff; font-weight: 700; }
+html[data-theme="dark"] .form-fields select,
+html[data-theme="dark"] .form-fields textarea { background: #191720; border-color: #373244; color: #eeeaf7; }
+html[data-theme="dark"] .delete-confirmation { color: #e6abb0; }
+html[data-theme="dark"] .delete-confirmation button { background: #382627; border-color: #754547; color: #f1b9bd; }
+html[data-theme="dark"] .delete-confirmation button:last-child { background: transparent; color: #c0bacf; }
+html[data-theme="dark"] .load-error-card { background: #382627; border-color: #754547; }
+html[data-theme="dark"] .load-error-card h3 { color: #f1b9bd; }
+html[data-theme="dark"] .load-error-card p { color: #d2a6aa; }
